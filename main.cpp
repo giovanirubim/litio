@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <stdint.h>
 
-#define BLOB_SIZE 24
+#define BLOB_SIZE (1 << 12)
 
 uint8_t blob[BLOB_SIZE];
 uint8_t buffer[BLOB_SIZE];
@@ -52,17 +52,24 @@ void initBlob(char const pwd[]) {
 	}
 }
 
+void showPercentage(int index, int n) {
+	double x = index;
+	printf("%.2lf%%\n", x/n*100);
+}
+
 void encrypt(char const fname[]) {
 	FILE* file = fopen(fname, "r+b");
 	if (!file) {
 		printf("Falha ao criptografar '%s'\n", fname);
 		return;
 	}
+	printf("Encriptando %s\n", fname);
 	fseek(file, 0L, SEEK_END);
 	uint64_t size = ftell(file);
 	fseek(file, 0L, SEEK_SET);
 	uint64_t left = size;
 	uint64_t index = 0;
+	uint64_t count = 0;
 	while (left) {
 		uint32_t n = left < BLOB_SIZE ? left : BLOB_SIZE;
 		fread(buffer, n, 1, file);
@@ -71,6 +78,9 @@ void encrypt(char const fname[]) {
 		fwrite(buffer, n, 1, file);
 		index += n;
 		left -= n;
+		if ((++count)%10000 == 0) {
+			showPercentage(index, size);
+		}
 	}
 	fclose(file);
 }
