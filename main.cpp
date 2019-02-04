@@ -93,13 +93,29 @@ int main(int argc, char const *argv[]) {
 		clear();
 		return 0;
 	}
-	printf("Senha: ");
-	char pwd[256];
-	scanf("%[^\n]%*c", pwd);
-	initBlob(pwd);
+	char pwd1[256];
+	char pwd2[256];
+	for (;;) {
+		clear();
+		printf("Senha: ");
+		scanf("%[^\n]%*c", pwd1);
+		clear();
+		printf("Repita a senha: ");
+		scanf("%[^\n]%*c", pwd2);
+		clear();
+		if (strcmp(pwd1, pwd2)) {
+			puts("As senhas nao conferem");
+			pause();
+		} else {
+			clear();
+			break;
+		}
+	}
+	initBlob(pwd1);
 	for (int i=1; i<argc; ++i) {
 		encrypt(argv[i]);
 	}
+	puts("Terminado");
 	pause();
 	clear();
 }
